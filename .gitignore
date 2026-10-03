@@ -21,3 +21,6 @@ credentials
 
 # OS
 .DS_Store
+
+# Lab-generated participant creds
+participant_credentials.txt
