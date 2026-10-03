@@ -221,3 +221,15 @@ resource "local_file" "trainer_notes" {
     ================================================================
   EOT
 }
+
+# Sourceable env file for the participant - no manual copy/paste of names.
+resource "local_file" "lab_env" {
+  filename        = "${path.module}/lab_env.sh"
+  file_permission = "0644"
+  content         = <<-EOT
+    # source this: `source lab_env.sh`
+    export AWS_DEFAULT_REGION=${data.aws_region.current.name}
+    export LISTABLE_BUCKET=${aws_s3_bucket.listable.id}
+    export WRITABLE_BUCKET=${aws_s3_bucket.writable.id}
+  EOT
+}

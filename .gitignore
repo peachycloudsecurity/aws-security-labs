@@ -29,3 +29,6 @@ terraform_waf_output.json
 
 # Lab-generated trainer answer key
 trainer_notes.txt
+
+# Lab-generated env file
+lab_env.sh

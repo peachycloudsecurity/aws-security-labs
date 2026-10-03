@@ -250,3 +250,17 @@ resource "local_file" "trainer_notes" {
     ================================================================
   EOT
 }
+
+# Sourceable env file for the participant - no manual copy/paste of names.
+resource "local_file" "lab_env" {
+  filename        = "${path.module}/lab_env.sh"
+  file_permission = "0644"
+  content         = <<-EOT
+    # source this: `source lab_env.sh`
+    export AWS_DEFAULT_REGION=${data.aws_region.current.name}
+    export ROLE_ARN=${aws_iam_role.overly_permissive.arn}
+    export FLAG_BUCKET=${aws_s3_bucket.flag.id}
+    export IN_SCOPE_SECRET=${aws_secretsmanager_secret.in_scope.name}
+    export DECOY_SECRET=${aws_secretsmanager_secret.decoy.name}
+  EOT
+}
