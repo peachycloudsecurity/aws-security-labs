@@ -86,6 +86,9 @@ resource "local_file" "participant_credentials" {
 
     This IAM user has NO permissions at all. See how far that still gets
     you against misconfigured S3 buckets.
+
+    Start here:
+      aws sts get-caller-identity --profile participant
     ================================================================
   EOT
 }

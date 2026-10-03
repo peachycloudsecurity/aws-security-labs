@@ -248,7 +248,7 @@ resource "local_file" "participant_credentials" {
     if anything, it can do - and how far that takes you.
 
     Start here:
-      aws sts get-caller-identity
+      aws sts get-caller-identity --profile participant
     ================================================================
   EOT
 }
