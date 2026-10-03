@@ -4,26 +4,33 @@ Hands-on AWS cloud-security lab scenarios for the Practical Security training. E
 parts:
 
 1. **Trainer deployment** — Terraform that stands up the intentionally vulnerable AWS infrastructure.
-   The trainer deploys it into their own lab account, then hands access to participants.
-2. **Participant steps** — the run + exploit walkthrough the participant follows against the
-   deployed environment.
+2. **Participant steps** — the run + exploit walkthrough the participant follows.
 
-> Credentials are assumed to be generated and configured by the trainer's deployment. Lab docs
-> never contain real secrets.
-
-## Layout
+All labs deploy together from a single root — **one `tofu apply`**, one `tofu destroy`:
 
 ```
-terraform/            # per-lab Terraform (added scenario by scenario)
+terraform/all/
+├── main.tf        # shared participant + trainer user, lab_env.sh + credential files
+├── providers.tf   # us-east-1 (IAM/S3) + us-west-2 (EC2/ALB/WAF)
+├── outputs.tf
+└── modules/
+    ├── overly/        # Overly permissive IAM (Principal:* role -> S3 + scoped Secrets)
+    ├── s3/            # Public listable + writable buckets
+    └── ec2_alb_waf/   # Vulnerable EC2 behind ALB + AWS WAF (bypass + Athena logs)
 ```
 
-## Planned labs
+## Deploy / destroy
 
-- Basics of IAM policies
-- Overly permissive IAM policies
-- Attacking S3 buckets
-- Attacking AWS WAF
-- EC2 & ALB security
-- AWS misconfiguration challenges
+```bash
+cd terraform/all
+tofu init
+tofu apply      # deploys ALL labs
+# ... run the labs ...
+tofu destroy    # tears everything down
+```
 
-> Scenarios and their Terraform are added one by one. This repo starts as the skeleton.
+A random suffix makes every resource name unique, so re-deploys never collide. Credentials are
+written to `participant_credentials.txt` / `trainer_credentials.txt`, and resource names to
+`lab_env.sh` (all gitignored).
+
+> Intentionally vulnerable. Deploy only in an isolated lab AWS account; destroy after each session.
