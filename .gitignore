@@ -24,3 +24,5 @@ credentials
 
 # Lab-generated participant creds
 participant_credentials.txt
+flag.txt
+terraform_waf_output.json
