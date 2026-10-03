@@ -187,3 +187,37 @@ resource "aws_s3_object" "writable_readme" {
   key     = "README.txt"
   content = "This bucket is writable by anyone. Prove it: upload a file here.\n"
 }
+
+###############################################################################
+# Trainer answer key - do NOT give to participants.
+###############################################################################
+
+resource "local_file" "trainer_notes" {
+  filename        = "${path.module}/trainer_notes.txt"
+  file_permission = "0600"
+  content         = <<-EOT
+    ================================================================
+     AWS Security Lab - Attacking S3 buckets
+     TRAINER notes / answer key  (do NOT give to participants)
+    ================================================================
+
+    Region          : ${data.aws_region.current.name}
+    Listable bucket : ${aws_s3_bucket.listable.id}
+    Writable bucket : ${aws_s3_bucket.writable.id}
+
+    Participant credentials (also in participant_credentials.txt, if created):
+      AWS_ACCESS_KEY_ID     = ${var.create_participant_user ? aws_iam_access_key.participant[0].id : "(reusing lab 1 creds)"}
+      AWS_SECRET_ACCESS_KEY = ${var.create_participant_user ? aws_iam_access_key.participant[0].secret : "(reusing lab 1 creds)"}
+
+    Flags:
+      Listable : FLAG{s3_public_listable_bucket}
+      Writable : FLAG{s3_public_writable_bucket}
+
+    Solution:
+      aws s3 ls s3://${aws_s3_bucket.listable.id}/ --recursive
+      aws s3 cp s3://${aws_s3_bucket.listable.id}/flag.txt -
+      echo pwned | aws s3 cp - s3://${aws_s3_bucket.writable.id}/pwned.txt
+      aws s3 cp s3://${aws_s3_bucket.writable.id}/flag.txt -
+    ================================================================
+  EOT
+}

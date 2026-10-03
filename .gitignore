@@ -26,3 +26,6 @@ credentials
 participant_credentials.txt
 flag.txt
 terraform_waf_output.json
+
+# Lab-generated trainer answer key
+trainer_notes.txt
