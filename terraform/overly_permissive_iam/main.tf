@@ -71,12 +71,28 @@ resource "aws_iam_user_policy" "participant_assume" {
   user = aws_iam_user.participant.name
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Sid      = "AssumeLabRole"
-      Effect   = "Allow"
-      Action   = "sts:AssumeRole"
-      Resource = aws_iam_role.overly_permissive.arn
-    }]
+    Statement = [
+      {
+        Sid      = "AssumeLabRole"
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = aws_iam_role.overly_permissive.arn
+      },
+      {
+        # Read-only IAM enumeration so the user can SEE roles, trust policies
+        # and their own (lack of) permissions - how an attacker finds the role.
+        Sid    = "ReadIAM"
+        Effect = "Allow"
+        Action = [
+          "iam:GetRole", "iam:ListRoles",
+          "iam:ListRolePolicies", "iam:GetRolePolicy", "iam:ListAttachedRolePolicies",
+          "iam:ListUsers", "iam:GetUser",
+          "iam:ListUserPolicies", "iam:GetUserPolicy", "iam:ListAttachedUserPolicies",
+          "iam:ListPolicies", "iam:GetPolicy", "iam:GetPolicyVersion"
+        ]
+        Resource = "*"
+      }
+    ]
   })
 }
 
@@ -96,12 +112,28 @@ resource "aws_iam_user_policy" "trainer_assume" {
   user = aws_iam_user.trainer.name
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Sid      = "AssumeLabRole"
-      Effect   = "Allow"
-      Action   = "sts:AssumeRole"
-      Resource = aws_iam_role.overly_permissive.arn
-    }]
+    Statement = [
+      {
+        Sid      = "AssumeLabRole"
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = aws_iam_role.overly_permissive.arn
+      },
+      {
+        # Read-only IAM enumeration so the user can SEE roles, trust policies
+        # and their own (lack of) permissions - how an attacker finds the role.
+        Sid    = "ReadIAM"
+        Effect = "Allow"
+        Action = [
+          "iam:GetRole", "iam:ListRoles",
+          "iam:ListRolePolicies", "iam:GetRolePolicy", "iam:ListAttachedRolePolicies",
+          "iam:ListUsers", "iam:GetUser",
+          "iam:ListUserPolicies", "iam:GetUserPolicy", "iam:ListAttachedUserPolicies",
+          "iam:ListPolicies", "iam:GetPolicy", "iam:GetPolicyVersion"
+        ]
+        Resource = "*"
+      }
+    ]
   })
 }
 
