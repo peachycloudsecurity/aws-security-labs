@@ -27,8 +27,3 @@ terraform/            # per-lab Terraform (added scenario by scenario)
 - AWS misconfiguration challenges
 
 > Scenarios and their Terraform are added one by one. This repo starts as the skeleton.
-
-## ⚠️ Warning
-
-These environments are **intentionally vulnerable**. Deploy only in an isolated lab AWS account,
-never in production or an account holding real data. Destroy (`terraform destroy`) after each session.

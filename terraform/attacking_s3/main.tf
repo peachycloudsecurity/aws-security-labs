@@ -15,10 +15,6 @@
 # Reuse: if the "Overly permissive IAM" lab is already deployed, set
 #   create_participant_user = false
 # and hand out those existing credentials instead.
-#
-# WARNING: creates PUBLIC buckets (one world-writable). Deploy only in an isolated
-# lab account and destroy promptly - a public writable bucket can be abused by
-# anyone on the internet.
 ###############################################################################
 
 terraform {

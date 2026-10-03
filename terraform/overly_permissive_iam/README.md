@@ -48,8 +48,3 @@ re-deployed right away.
 2. `aws sts assume-role` on the `Principal:"*"` role succeeds.
 3. With the role's temp creds: list + read the bucket flag, and read `peachycloud_sec_flag`.
 4. The decoy `internal_db_password` returns AccessDenied — scoping works.
-
-## ⚠️ Warning
-
-Intentionally vulnerable (`Principal:"*"` trust). Deploy only in an isolated lab account. Never in
-production or an account with real data. Always `tofu destroy` after the session.

@@ -48,8 +48,3 @@ tofu output writable_bucket
 ```bash
 tofu destroy
 ```
-
-## ⚠️ Warning
-
-Creates PUBLIC buckets, one **world-writable**. Anyone on the internet can read/write them while they
-exist. Deploy only in an isolated lab account and `tofu destroy` as soon as the session ends.

@@ -14,8 +14,6 @@
 #
 # The participant assumes the wide-open role and escalates from "no access" to
 # reading the bucket flag and the scoped secret.
-#
-# WARNING: intentionally vulnerable. Deploy only in an isolated lab account.
 ###############################################################################
 
 terraform {
