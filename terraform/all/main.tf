@@ -24,9 +24,20 @@ module "overly" {
   suffix = random_string.suffix.result
 }
 
+# The S3 lab is intentionally about PUBLIC buckets. If the lab account has S3
+# Block Public Access enabled (default on newer accounts), public bucket policies
+# are refused. Disable it account-wide so the lab can create its public buckets.
+resource "aws_s3_account_public_access_block" "this" {
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
 module "s3" {
-  source = "./modules/s3"
-  suffix = random_string.suffix.result
+  source     = "./modules/s3"
+  suffix     = random_string.suffix.result
+  depends_on = [aws_s3_account_public_access_block.this]
 }
 
 module "ec2_alb_waf" {
