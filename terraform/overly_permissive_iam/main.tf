@@ -57,7 +57,7 @@ locals {
 ###############################################################################
 
 resource "aws_iam_user" "participant" {
-  name          = "peachycloud-participant"
+  name          = "peachycloud-participant-${random_string.suffix.result}"
   force_destroy = true
 }
 
@@ -99,7 +99,7 @@ resource "aws_iam_user_policy" "participant_assume" {
 # Trainer user — identical no-permission user so the trainer can demo the exact
 # same steps and get the same output as participants.
 resource "aws_iam_user" "trainer" {
-  name          = "peachycloud-trainer"
+  name          = "peachycloud-trainer-${random_string.suffix.result}"
   force_destroy = true
 }
 
@@ -161,7 +161,7 @@ resource "local_file" "trainer_credentials" {
 ###############################################################################
 
 resource "aws_iam_role" "overly_permissive" {
-  name = "peachycloud-overly-permissive-role"
+  name = "peachycloud-overly-permissive-role-${random_string.suffix.result}"
 
   # !!! MISCONFIGURATION: any principal can assume this role.
   assume_role_policy = jsonencode({
@@ -239,7 +239,7 @@ resource "aws_s3_object" "flag" {
 ###############################################################################
 
 resource "aws_secretsmanager_secret" "in_scope" {
-  name                    = "peachycloud_sec_flag"
+  name                    = "peachycloud_sec_flag_${random_string.suffix.result}"
   recovery_window_in_days = 0 # allow immediate re-create in labs
 }
 
@@ -250,7 +250,7 @@ resource "aws_secretsmanager_secret_version" "in_scope" {
 
 # Decoy: NOT named peachycloud_sec_* -> role must NOT be able to read it.
 resource "aws_secretsmanager_secret" "decoy" {
-  name                    = "internal_db_password"
+  name                    = "internal_db_password_${random_string.suffix.result}"
   recovery_window_in_days = 0
 }
 
@@ -335,6 +335,7 @@ resource "local_file" "lab_env" {
     # source this: `source lab_env.sh`
     export AWS_DEFAULT_REGION=${data.aws_region.current.name}
     export ROLE_ARN=${aws_iam_role.overly_permissive.arn}
+    export ROLE_NAME=${aws_iam_role.overly_permissive.name}
     export FLAG_BUCKET=${aws_s3_bucket.flag.id}
     export IN_SCOPE_SECRET=${aws_secretsmanager_secret.in_scope.name}
     export DECOY_SECRET=${aws_secretsmanager_secret.decoy.name}
