@@ -32,3 +32,6 @@ trainer_notes.txt
 
 # Lab-generated env file
 lab_env.sh
+
+# Lab-generated trainer login creds
+trainer_credentials.txt

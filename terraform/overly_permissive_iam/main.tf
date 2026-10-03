@@ -80,6 +80,50 @@ resource "aws_iam_user_policy" "participant_assume" {
   })
 }
 
+# Trainer user — identical no-permission user so the trainer can demo the exact
+# same steps and get the same output as participants.
+resource "aws_iam_user" "trainer" {
+  name          = "peachycloud-trainer"
+  force_destroy = true
+}
+
+resource "aws_iam_access_key" "trainer" {
+  user = aws_iam_user.trainer.name
+}
+
+resource "aws_iam_user_policy" "trainer_assume" {
+  name = "allow-assume-lab-role"
+  user = aws_iam_user.trainer.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid      = "AssumeLabRole"
+      Effect   = "Allow"
+      Action   = "sts:AssumeRole"
+      Resource = aws_iam_role.overly_permissive.arn
+    }]
+  })
+}
+
+resource "local_file" "trainer_credentials" {
+  filename        = "${path.module}/trainer_credentials.txt"
+  file_permission = "0600"
+  content         = <<-EOT
+    ================================================================
+     AWS Security Lab - Overly permissive IAM policies
+     TRAINER credentials  (same no-permission user as participants)
+    ================================================================
+
+    AWS_ACCESS_KEY_ID     = ${aws_iam_access_key.trainer.id}
+    AWS_SECRET_ACCESS_KEY = ${aws_iam_access_key.trainer.secret}
+    AWS_DEFAULT_REGION    = ${local.region}
+
+    Configure a profile and run the same steps you show participants:
+      aws configure --profile trainer
+    ================================================================
+  EOT
+}
+
 ###############################################################################
 # 2. The overly-permissive role — trust policy allows Principal "*".
 ###############################################################################

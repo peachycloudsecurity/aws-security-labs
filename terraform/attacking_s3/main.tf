@@ -90,6 +90,39 @@ resource "local_file" "participant_credentials" {
   EOT
 }
 
+# Trainer user — identical zero-permission user so the trainer can demo the exact
+# same steps and get the same output as participants.
+resource "aws_iam_user" "trainer" {
+  count         = var.create_participant_user ? 1 : 0
+  name          = "peachycloud-trainer"
+  force_destroy = true
+}
+
+resource "aws_iam_access_key" "trainer" {
+  count = var.create_participant_user ? 1 : 0
+  user  = aws_iam_user.trainer[0].name
+}
+
+resource "local_file" "trainer_credentials" {
+  count           = var.create_participant_user ? 1 : 0
+  filename        = "${path.module}/trainer_credentials.txt"
+  file_permission = "0600"
+  content         = <<-EOT
+    ================================================================
+     AWS Security Lab - Attacking S3 buckets
+     TRAINER credentials  (same no-permission user as participants)
+    ================================================================
+
+    AWS_ACCESS_KEY_ID     = ${aws_iam_access_key.trainer[0].id}
+    AWS_SECRET_ACCESS_KEY = ${aws_iam_access_key.trainer[0].secret}
+    AWS_DEFAULT_REGION    = ${data.aws_region.current.name}
+
+    Same zero-permission user as participants - run the same steps to demo.
+      aws configure --profile trainer
+    ================================================================
+  EOT
+}
+
 ###############################################################################
 # Bucket 1 - world LISTABLE + readable
 ###############################################################################
