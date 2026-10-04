@@ -34,10 +34,18 @@ resource "aws_s3_account_public_access_block" "this" {
   restrict_public_buckets = false
 }
 
+# Disabling account Block Public Access is eventually consistent; wait for it to
+# propagate before the S3 module creates public bucket policies (avoids a
+# BlockPublicPolicy AccessDenied race on the first apply).
+resource "time_sleep" "bpa_propagate" {
+  depends_on      = [aws_s3_account_public_access_block.this]
+  create_duration = "20s"
+}
+
 module "s3" {
   source     = "./modules/s3"
   suffix     = random_string.suffix.result
-  depends_on = [aws_s3_account_public_access_block.this]
+  depends_on = [time_sleep.bpa_propagate]
 }
 
 module "ec2_alb_waf" {
